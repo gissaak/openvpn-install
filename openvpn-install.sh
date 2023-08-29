@@ -899,7 +899,18 @@ tls-version-min 1.2
 tls-cipher $CC_CIPHER
 client-config-dir /etc/openvpn/ccd
 status /var/log/openvpn/status.log
-verb 3" >>/etc/openvpn/server.conf
+verb 3
+auth-user-pass-verify /etc/openvpn/checkpsw.sh via-env
+script-security 3
+username-as-common-name" >>/etc/openvpn/server.conf
+
+	echo "user01 123456" >> /etc/openvpn/psw-file
+	chown nobody:nobody /etc/openvpn/psw-file
+
+	wget -O /etc/openvpn/checkpsw.sh http://openvpn.se/files/other/checkpsw.sh
+	chmod 755 /etc/openvpn/checkpsw.sh
+	chown nobody:nobody /etc/openvpn/checkpsw.sh
+
 
 	# Create client-config-dir dir
 	mkdir -p /etc/openvpn/ccd
@@ -1046,7 +1057,8 @@ tls-version-min 1.2
 tls-cipher $CC_CIPHER
 ignore-unknown-option block-outside-dns
 setenv opt block-outside-dns # Prevent Windows 10 DNS leak
-verb 3" >>/etc/openvpn/client-template.txt
+verb 3
+auth-user-pass" >>/etc/openvpn/client-template.txt
 
 	if [[ $COMPRESSION_ENABLED == "y" ]]; then
 		echo "compress $COMPRESSION_ALG" >>/etc/openvpn/client-template.txt
